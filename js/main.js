@@ -1,5 +1,5 @@
 // script.js
-// ---- Datos: array de servicios a realizar(array de objetos) ----
+//Datos: array de servicios 
 const servicios = [
   { id: 1, nombre: "Uñas Esculpidas", duracion: "120 min" },
   { id: 2, nombre: "Semipermanente en manos", duracion: "30 min" },
@@ -13,9 +13,9 @@ const servicios = [
   { id: 10, nombre: "Hidragloss Labial", duracion: "30 min" }
 ];
 
-// ---- Referencias DOM ----
+// elementos del HTML
 const carouselInner = document.getElementById('carousel-inner');
-const contenedorTurnos = document.getElementById('turnos-container');
+const contenedorTurnos = document.getElementById('turnos-list');
 const inputServicio = document.getElementById('servicioSeleccionado');
 const inputFecha = document.getElementById('fechaSeleccionada');
 const inputHora = document.getElementById('horaSeleccionada');
@@ -94,7 +94,7 @@ carouselInner.addEventListener('click', (e) => {
   };
 });
 
-//funcion para turnos
+//mostrar turnos
 function imprimirTurnos() {
   contenedorTurnos.innerHTML = '';
 
@@ -133,14 +133,14 @@ function agregarTurno(nombre, apellido, servicio, fecha, hora) {
   imprimirTurnos();
 }
 
-// ---- Atender turno (eliminar) función de orden superior: filter----
+// eliminar turno
 function atenderTurno(numero) {
   turnos = turnos.filter(t => t.numero !== numero);
   localStorage.setItem('turnos', JSON.stringify(turnos));
   imprimirTurnos();
 }
 
-// ---- Manejo del submit del form ----
+//enviar al formulario
 form.addEventListener('submit', (e) => {
   e.preventDefault();
   const nombre = document.getElementById('nombreCliente').value.trim();
@@ -161,5 +161,5 @@ form.addEventListener('submit', (e) => {
   inputHora.value = '';
 });
 
-// ---- Inicializar ----
+// iniciar la lista
 imprimirTurnos();

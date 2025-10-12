@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <!--javascript-->
+    <script defer src="./js/main.js"></script>
+
+    <title>Agenda de Turnos Femina</title>
+
+    <!--link para usar Bootstrap-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap JS bundle (popper incluido) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!--link para usar Css-->
+    <link rel="stylesheet" href="./css/styles.css">
+    
+
+</head>
+<body class="bg-light">
+
+  <div class="container py-5">
+    <h1 class="mb-4 text-center">Turnero Estética</h1>
+
+    <div class="row">
+      <!-- carrusel de servicios -->
+      <div class="col-lg-7 mb-4">
+        <div id="serviciosCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner" id="carousel-inner">
+          </div>
+
+          <!-- Controles -->
+          <button class="carousel-control-prev" type="button" data-bs-target="#serviciosCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#serviciosCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Siguiente</span>
+          </button>
+        </div>
+      </div>
+
+      <!--formulario-->
+      <div class="col-lg-5">
+        <div class="card p-3 shadow-sm">
+          <h5>Solicitar un turno</h5>
+
+          <form id="turnoFormulario" novalidate>
+            <div class="mb-2">
+              <label for="nombreCliente" class="form-label">Nombre</label>
+              <input id="nombreCliente" class="form-control" type="text" required>
+            </div>
+
+            <div class="mb-2">
+              <label for="apellidoCliente" class="form-label">Apellido</label>
+              <input id="apellidoCliente" class="form-control" type="text" required>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label">Servicio seleccionado</label>
+              <input id="servicioSeleccionado" class="form-control" type="text" readonly placeholder="Elegí un servicio desde el carrusel">
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label">Fecha</label>
+              <input id="fechaSeleccionada" class="form-control" type="date" readonly>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Hora</label>
+              <input id="horaSeleccionada" class="form-control" type="time" readonly>
+            </div>
+
+            <button class="btn btn-primary w-100" type="submit">Pedir Turno</button>
+          </form>
+        </div>
+
+        <!-- Turnos en espera -->
+        <h5 class="mt-4">Turnos en espera</h5>
+        <div id="turnos-container" class="mt-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal fecha/hora-->
+  <div class="modal fade" id="modalFechaHora" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Elegir fecha y hora</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p id="modalServicioNombre" class="fw-semibold"></p>
+          <div class="mb-3">
+            <label class="form-label">Fecha</label>
+            <input id="modalFecha" type="date" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Hora</label>
+            <input id="modalHora" type="time" class="form-control">
+          </div>
+          <div id="modalError" class="text-danger small d-none">Seleccioná fecha y hora válidas.</div>
+        </div>
+        <div class="modal-footer">
+          <button id="modalConfirmar" type="button" class="btn btn-primary">Confirmar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS bundle (popper incluido) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

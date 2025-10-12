@@ -35,7 +35,7 @@ const bsModal = new bootstrap.Modal(modalEl);
 let turnos = JSON.parse(localStorage.getItem('turnos')) || [];
 let contador = turnos.length > 0 ? turnos[turnos.length - 1].numero : 0;
 
-// ---- Crear slides del carousel dinámicamente ----
+// slides del carousel
 const perSlide = 3;
 for (let i = 0; i < servicios.length; i += perSlide) {
   const slice = servicios.slice(i, i + perSlide);
@@ -65,7 +65,7 @@ for (let i = 0; i < servicios.length; i += perSlide) {
   carouselInner.appendChild(item);
 }
 
-// ----   click en "Elegir servicio" ----
+//click en "Elegir servicio"
 carouselInner.addEventListener('click', (e) => {
   const btn = e.target.closest('.btn-elegir');
   if (!btn) return;
@@ -73,20 +73,20 @@ carouselInner.addEventListener('click', (e) => {
   const servicio = servicios.find(s => s.id === id);
   if (!servicio) return;
 
-  // Abrir modal y prellenar nombre del servicio
+  // prellenar servicio
   modalServicioNombre.textContent = servicio.nombre;
   modalFecha.value = ''; // limpia
   modalHora.value = '';
   modalError.classList.add('d-none');
   bsModal.show();
 
-  // Cuando confirmen se setea en el formulario
+  // confirmar formulario
   modalConfirmarBtn.onclick = () => {
     if (!modalFecha.value || !modalHora.value) {
       modalError.classList.remove('d-none');
       return;
     }
-    // Pone los datos en los inputs del formulario
+    // datos del formulario
     inputServicio.value = servicio.nombre;
     inputFecha.value = modalFecha.value;
     inputHora.value = modalHora.value;
@@ -94,7 +94,7 @@ carouselInner.addEventListener('click', (e) => {
   };
 });
 
-// ---- Función para imprimir turnos ----
+//funcion para turnos
 function imprimirTurnos() {
   contenedorTurnos.innerHTML = '';
 
@@ -124,7 +124,7 @@ function imprimirTurnos() {
   });
 }
 
-// ---- Agregar turno ----
+//Agregar turno
 function agregarTurno(nombre, apellido, servicio, fecha, hora) {
   contador++;
   const nuevo = { numero: contador, nombre, apellido, servicio, fecha, hora };

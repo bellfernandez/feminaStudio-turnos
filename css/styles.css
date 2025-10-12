@@ -14,7 +14,7 @@
 }
 
 body {
-  background-color: #fff5f8; 
+  background-color: #fff5f8 !important; 
 }
 .btn-primary {
   background-color: #ff6f91 !important; 
@@ -35,4 +35,9 @@ body {
 .btn-success:hover {
   background-color: #6cab50 !important;
   border-color: #6cab50 !important;
+}
+
+.btn-outline-primary {
+  color: #6cab50 !important;          
+  border-color: #6cab50 !important;   
 }

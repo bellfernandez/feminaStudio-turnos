@@ -106,7 +106,7 @@ function imprimirTurnos() {
       <div class="card-body d-flex align-items-center justify-content-between">
         <div>
           <h6 class="mb-1">Turno N° ${turno.numero}</h6>
-          <div>${turno.nombreCliente} ${turno.apellidoCliente}</div>
+          <div>${turno.nombre} ${turno.apellido}</div>
           <div class="text-muted small">${turno.servicio} • ${turno.fecha} ${turno.hora}</div>
         </div>
         <button class="btn btn-success btn-sm btn-atender" data-num="${turno.numero}">Atender</button>

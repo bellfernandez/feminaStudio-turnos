@@ -12,3 +12,24 @@
 @media (max-width: 767px) {
   .servicio-card { width: 42vw !important; } 
 }
+
+.btn-primary {
+  background-color: #ff6f91 !important; /* rosa suave */
+  border-color: #ff6f91 !important;
+}
+
+.btn-primary:hover {
+  background-color: #ff4d73 !important;
+  border-color: #ff4d73 !important;
+}
+
+/* Cambiar color del botón "Atender" */
+.btn-success {
+  background-color: #88c273 !important; /* verde pastel */
+  border-color: #88c273 !important;
+}
+
+.btn-success:hover {
+  background-color: #6cab50 !important;
+  border-color: #6cab50 !important;
+}

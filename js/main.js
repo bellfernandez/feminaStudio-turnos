@@ -148,14 +148,14 @@ form.addEventListener('submit', (e) => {
   const servicio = inputServicio.value.trim();
   const fecha = inputFecha.value;
   const hora = inputHora.value;
-  const errorMsg = document.getElementById('formError');
+ 
 
   if (!nombre || !apellido || !servicio || !fecha || !hora) {
     
     return;
   }
 
-  errorMsg.classList.add('d-none');
+  
 
   agregarTurno(nombre, apellido, servicio, fecha, hora);
   form.reset();

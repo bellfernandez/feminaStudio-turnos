@@ -13,8 +13,11 @@
   .servicio-card { width: 42vw !important; } 
 }
 
+body {
+  background-color: #fff5f8; 
+}
 .btn-primary {
-  background-color: #ff6f91 !important; /* rosa suave */
+  background-color: #ff6f91 !important; 
   border-color: #ff6f91 !important;
 }
 
@@ -23,9 +26,9 @@
   border-color: #ff4d73 !important;
 }
 
-/* Cambiar color del botón "Atender" */
+
 .btn-success {
-  background-color: #88c273 !important; /* verde pastel */
+  background-color: #88c273 !important; 
   border-color: #88c273 !important;
 }
 

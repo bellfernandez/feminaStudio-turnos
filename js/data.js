@@ -2,7 +2,7 @@ let servicios = [];
 
 async function cargarServicios() {
   try {
-    const res = await fetch('js/servicios.json');
+    const res = await fetch('./js/servicios.json');
     if (!res.ok) throw new Error('No se pudo cargar servicios');
     servicios = await res.json();
     renderizarCarousel(servicios);
@@ -40,7 +40,7 @@ function renderizarCarousel(serviciosList) {
         <div class="card-body d-flex flex-column">
           <h6 class="card-title">${serv.nombre}</h6>
           <p class="card-text text-muted small mb-3">${serv.duracion}</p>
-         <button class="btn btn-primary btn-elegir" data-id="${servicio.id}">Elegir</button>
+          <button class="btn btn-primary btn-elegir" data-id="${serv.id}">Elegir</button>
          </div>
       `;
       row.appendChild(card);

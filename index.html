@@ -30,8 +30,9 @@
     <h1 class="mb-4 text-center">Agenda de turnos Femina Studio</h1>
 
     <div class="row">
+      
       <!-- servicios -->
-       <div class="col-lg-7 mb-4">
+      <div class="col-lg-7 mb-4">
         <div class="d-flex justify-content-between mb-2">
           <h5>Servicios</h5>
           <div>
@@ -54,11 +55,10 @@
         </div>
       </div>
 
-      <!--formulario-->
+      <!-- Formulario y turnos -->
       <div class="col-lg-5">
         <div class="card p-3 shadow-sm">
           <h5>Solicitar un turno</h5>
-
           <form id="turnoFormulario" novalidate>
             <div class="mb-2">
               <label for="nombreCliente" class="form-label">Nombre</label>
@@ -87,12 +87,16 @@
 
             <button class="btn btn-primary w-100" type="submit">Pedir Turno</button>
           </form>
+
+          <!-- Turno del cliente -->
+          <div id="turno-cliente" class="mt-3"></div>
         </div>
 
-        <!-- Turnos en espera -->
+        <!-- Turnos en espera solo admin -->
         <div id="turnos-admin" class="mt-4 d-none">
-        <h5>Turnos en espera</h5>
-        <div id="turnos-list" class="mt-2"></div>
+          <h5>Turnos en espera</h5>
+          <div id="turnos-list" class="mt-2"></div>
+        </div>
       </div>
     </div>
   </div>

@@ -1,5 +1,9 @@
 // elementos
-const contenedorTurnos = document.getElementById('turnos-list');
+const contenedorTurnosAdmin = document.getElementById('turnos-list');
+const contenedorTurnoCliente = document.createElement('div');
+contenedorTurnoCliente.id = 'turno-cliente';
+document.querySelector('.col-lg-5').appendChild(contenedorTurnoCliente);
+
 const inputServicio = document.getElementById('servicioSeleccionado');
 const inputFecha = document.getElementById('fechaSeleccionada');
 const inputHora = document.getElementById('horaSeleccionada');
@@ -20,7 +24,7 @@ let turnos = JSON.parse(localStorage.getItem('turnos')) || [];
 let contador = turnos.length > 0 ? turnos[turnos.length - 1].numero : 0;
 let isAdmin = false; // sesión admin básica
 
-
+// fecha mínima
 function fechaHoyFormato() {
   const hoy = new Date();
   const yyyy = hoy.getFullYear();
@@ -30,17 +34,16 @@ function fechaHoyFormato() {
 }
 const hoyStr = fechaHoyFormato();
 modalFecha.min = hoyStr;
-inputFecha.min = hoyStr; 
+inputFecha.min = hoyStr;
 
 // reglas de horario
 const HORA_MIN = "08:00";
 const HORA_MAX = "20:00";
-
 function horaValida(hora) {
   return hora >= HORA_MIN && hora <= HORA_MAX;
 }
 
-// Manejo admin 
+// LOGIN/LOGOUT ADMIN
 btnLoginAdmin.addEventListener('click', async () => {
   const { value: password } = await Swal.fire({
     title: 'Contraseña admin',
@@ -55,7 +58,7 @@ btnLoginAdmin.addEventListener('click', async () => {
       btnLoginAdmin.classList.add('d-none');
       btnLogoutAdmin.classList.remove('d-none');
       Swal.fire({ icon: 'success', title: 'Bienvenido admin' });
-      imprimirTurnos(); // muestra botones
+      imprimirTurnosAdmin(); // mostrar turnos admin
     } else {
       Swal.fire({ icon: 'error', text: 'Contraseña incorrecta' });
     }
@@ -66,8 +69,7 @@ btnLogoutAdmin.addEventListener('click', () => {
   isAdmin = false;
   btnLoginAdmin.classList.remove('d-none');
   btnLogoutAdmin.classList.add('d-none');
-  Swal.fire({ icon: 'info', text: 'Cerraste sesión admin' });
-  imprimirTurnos();
+  imprimirTurnosAdmin(); // ocultar turnos admin
 });
 
 // CLICK en elegir servicio
@@ -111,23 +113,48 @@ document.getElementById('carousel-inner').addEventListener('click', (e) => {
   };
 });
 
-// imprimir turnos
-function imprimirTurnos() {
-  const contenedorTurnosWrapper = document.getElementById('turnos-admin');
-  const contenedorTurnos = document.getElementById('turnos-list');
+// AGREGAR TURNO
+function agregarTurno(nombre, apellido, servicio, fecha, hora) {
+  try {
+    contador++;
+    const nuevo = { numero: contador, nombre, apellido, servicio, fecha, hora };
+    turnos.push(nuevo);
+    localStorage.setItem('turnos', JSON.stringify(turnos));
+    Swal.fire({ icon: 'success', text: `Turno reservado. N° ${nuevo.numero}` });
 
-  // Ocultar toda la sección si no es admin
-  if (!isAdmin) {
-    contenedorTurnosWrapper.classList.add('d-none');
-    return;
-  } else {
-    contenedorTurnosWrapper.classList.remove('d-none');
+    // Mostrar turno al cliente
+    mostrarTurnoCliente(nuevo);
+
+    // Solo mostrar turnos admin si está logueado
+    if(isAdmin) imprimirTurnosAdmin();
+  } catch (error) {
+    console.error(error);
+    Swal.fire({ icon: 'error', text: 'No se pudo guardar el turno' });
   }
+}
 
-  // Limpiar contenido anterior
-  contenedorTurnos.innerHTML = '';
+// MOSTRAR TURNO CLIENTE
+function mostrarTurnoCliente(turno) {
+  contenedorTurnoCliente.innerHTML = `
+    <div class="card p-2 mb-2">
+      <div>Turno N° ${turno.numero}</div>
+      <div>Servicio: ${turno.servicio}</div>
+      <div>Fecha: ${turno.fecha}</div>
+      <div>Hora: ${turno.hora}</div>
+    </div>
+  `;
+}
 
-  // Renderizar turnos
+// IMPRIMIR TURNOS SOLO ADMIN
+function imprimirTurnosAdmin() {
+  const contenedorWrapper = document.getElementById('turnos-admin');
+  if(!isAdmin) {
+    contenedorWrapper.classList.add('d-none');
+    return;
+  }
+  contenedorWrapper.classList.remove('d-none');
+  contenedorTurnosAdmin.innerHTML = '';
+
   turnos.forEach(turno => {
     const card = document.createElement('div');
     card.className = 'card mb-2';
@@ -143,11 +170,10 @@ function imprimirTurnos() {
         </div>
       </div>
     `;
-    contenedorTurnos.appendChild(card);
+    contenedorTurnosAdmin.appendChild(card);
   });
 
-  // Asignar eventos a los botones de atender
-  contenedorTurnos.querySelectorAll('.btn-atender').forEach(b => {
+  contenedorTurnosAdmin.querySelectorAll('.btn-atender').forEach(b => {
     b.addEventListener('click', () => {
       const num = Number(b.dataset.num);
       atenderTurno(num);
@@ -155,7 +181,15 @@ function imprimirTurnos() {
   });
 }
 
-// submit del formulario con validaciones
+// ATENDER TURNO (solo admin)
+function atenderTurno(numero) {
+  turnos = turnos.filter(t => t.numero !== numero);
+  localStorage.setItem('turnos', JSON.stringify(turnos));
+  Swal.fire({ icon: 'success', text: `Turno N° ${numero} atendido` });
+  imprimirTurnosAdmin();
+}
+
+// SUBMIT FORM
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
@@ -179,23 +213,15 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  // agregar turno con try-catch-finally
-  try {
-    agregarTurno(nombre, apellido, servicio, fecha, hora);
-    // reset del formulario
-    form.reset();
-    inputServicio.value = '';
-    inputFecha.value = '';
-    inputHora.value = '';
-  } catch (err) {
-    Swal.fire({ icon: 'error', text: 'Error al crear el turno' });
-  } finally {
-    
-    imprimirTurnos();
-  }
+  agregarTurno(nombre, apellido, servicio, fecha, hora);
+
+  form.reset();
+  inputServicio.value = '';
+  inputFecha.value = '';
+  inputHora.value = '';
 });
 
 // iniciar lista al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
-  imprimirTurnos();
+  if(isAdmin) imprimirTurnosAdmin();
 });

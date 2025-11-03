@@ -113,8 +113,21 @@ document.getElementById('carousel-inner').addEventListener('click', (e) => {
 
 // imprimir turnos
 function imprimirTurnos() {
+  const contenedorTurnosWrapper = document.getElementById('turnos-admin');
+  const contenedorTurnos = document.getElementById('turnos-list');
+
+  // Ocultar toda la sección si no es admin
+  if (!isAdmin) {
+    contenedorTurnosWrapper.classList.add('d-none');
+    return;
+  } else {
+    contenedorTurnosWrapper.classList.remove('d-none');
+  }
+
+  // Limpiar contenido anterior
   contenedorTurnos.innerHTML = '';
 
+  // Renderizar turnos
   turnos.forEach(turno => {
     const card = document.createElement('div');
     card.className = 'card mb-2';
@@ -126,46 +139,20 @@ function imprimirTurnos() {
           <div class="text-muted small">${turno.servicio} • ${turno.fecha} ${turno.hora}</div>
         </div>
         <div class="d-flex gap-2 align-items-center">
-          ${ isAdmin ? `<button class="btn btn-success btn-sm btn-atender" data-num="${turno.numero}">Atender</button>` : '' }
+          <button class="btn btn-success btn-sm btn-atender" data-num="${turno.numero}">Atender</button>
         </div>
       </div>
     `;
     contenedorTurnos.appendChild(card);
   });
 
-  // asignar eventos: admin
-  if (isAdmin) {
-    contenedorTurnos.querySelectorAll('.btn-atender').forEach(b => {
-      b.addEventListener('click', () => {
-        const num = Number(b.dataset.num);
-        atenderTurno(num);
-      });
+  // Asignar eventos a los botones de atender
+  contenedorTurnos.querySelectorAll('.btn-atender').forEach(b => {
+    b.addEventListener('click', () => {
+      const num = Number(b.dataset.num);
+      atenderTurno(num);
     });
-  }
-}
-
-// agregar turno (con try-catch-finally)
-function agregarTurno(nombre, apellido, servicio, fecha, hora) {
-  try {
-    contador++;
-    const nuevo = { numero: contador, nombre, apellido, servicio, fecha, hora };
-    turnos.push(nuevo);
-    localStorage.setItem('turnos', JSON.stringify(turnos));
-    Swal.fire({ icon: 'success', text: `Turno reservado. N° ${nuevo.numero}` });
-    imprimirTurnos();
-  } catch (error) {
-    Swal.fire({ icon: 'error', text: 'No se pudo guardar el turno' });
-  } finally {
-    
-  }
-}
-
-// atender turno (solo admin)
-function atenderTurno(numero) {
-  turnos = turnos.filter(t => t.numero !== numero);
-  localStorage.setItem('turnos', JSON.stringify(turnos));
-  Swal.fire({ icon: 'success', text: `Turno N° ${numero} atendido` });
-  imprimirTurnos();
+  });
 }
 
 // submit del formulario con validaciones

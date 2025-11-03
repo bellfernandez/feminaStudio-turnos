@@ -1,28 +1,10 @@
-// script.js
-//Datos: array de servicios 
-const servicios = [
-  { id: 1, nombre: "Uñas Esculpidas", duracion: "120 min" },
-  { id: 2, nombre: "Semipermanente en manos", duracion: "30 min" },
-  { id: 3, nombre: "Capping gel", duracion: "90 min" },
-  { id: 4, nombre: "Soft Gel", duracion: "120 min" },
-  { id: 5, nombre: "Servicio de pies", duracion: "40 min" },
-  { id: 6, nombre: "depilacion de cejas con hilo", duracion: "20 min" },
-  { id: 7, nombre: "Laminado de cejas", duracion: "70 min" },
-  { id: 8, nombre: "Lifting de pestañas", duracion: "50 min" },
-  { id: 9, nombre: "Microblandig de cejas", duracion: "180 min" },
-  { id: 10, nombre: "Hidragloss Labial", duracion: "30 min" }
-];
-
-// elementos del HTML
-const carouselInner = document.getElementById('carousel-inner');
+// elementos
 const contenedorTurnos = document.getElementById('turnos-list');
 const inputServicio = document.getElementById('servicioSeleccionado');
 const inputFecha = document.getElementById('fechaSeleccionada');
 const inputHora = document.getElementById('horaSeleccionada');
-
 const form = document.getElementById('turnoFormulario');
 
-// Modal elements
 const modalEl = document.getElementById('modalFechaHora');
 const modalServicioNombre = document.getElementById('modalServicioNombre');
 const modalFecha = document.getElementById('modalFecha');
@@ -31,62 +13,97 @@ const modalError = document.getElementById('modalError');
 const modalConfirmarBtn = document.getElementById('modalConfirmar');
 const bsModal = new bootstrap.Modal(modalEl);
 
-// Local storage para turnos
+const btnLoginAdmin = document.getElementById('btn-login-admin');
+const btnLogoutAdmin = document.getElementById('btn-logout-admin');
+
 let turnos = JSON.parse(localStorage.getItem('turnos')) || [];
 let contador = turnos.length > 0 ? turnos[turnos.length - 1].numero : 0;
+let isAdmin = false; // sesión admin básica
 
-// slides del carousel
-const perSlide = 3;
-for (let i = 0; i < servicios.length; i += perSlide) {
-  const slice = servicios.slice(i, i + perSlide);
 
-  const item = document.createElement('div');
-  item.className = 'carousel-item';
-  if (i === 0) item.classList.add('active');
+function fechaHoyFormato() {
+  const hoy = new Date();
+  const yyyy = hoy.getFullYear();
+  const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+  const dd = String(hoy.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+const hoyStr = fechaHoyFormato();
+modalFecha.min = hoyStr;
+inputFecha.min = hoyStr; 
 
-  const row = document.createElement('div');
-  row.className = 'd-flex justify-content-start gap-3 p-3';
+// reglas de horario
+const HORA_MIN = "08:00";
+const HORA_MAX = "20:00";
 
-  slice.forEach(serv => {
-    const card = document.createElement('div');
-    card.className = 'card servicio-card';
-    card.style.width = '12rem';
-    card.innerHTML = `
-      <div class="card-body d-flex flex-column">
-        <h6 class="card-title">${serv.nombre}</h6>
-        <p class="card-text text-muted small mb-3">${serv.duracion}</p>
-        <button class="btn btn-outline-primary mt-auto btn-elegir" type="button" data-id="${serv.id}">Elegir servicio</button>
-      </div>
-    `;
-    row.appendChild(card);
-  });
-
-  item.appendChild(row);
-  carouselInner.appendChild(item);
+function horaValida(hora) {
+  return hora >= HORA_MIN && hora <= HORA_MAX;
 }
 
-//click en "Elegir servicio"
-carouselInner.addEventListener('click', (e) => {
+// Manejo admin 
+btnLoginAdmin.addEventListener('click', async () => {
+  const { value: password } = await Swal.fire({
+    title: 'Contraseña admin',
+    input: 'password',
+    inputPlaceholder: 'Ingresá la contraseña',
+    showCancelButton: true
+  });
+
+  if (password) {
+    if (password === 'admin123') {
+      isAdmin = true;
+      btnLoginAdmin.classList.add('d-none');
+      btnLogoutAdmin.classList.remove('d-none');
+      Swal.fire({ icon: 'success', title: 'Bienvenido admin' });
+      imprimirTurnos(); // muestra botones
+    } else {
+      Swal.fire({ icon: 'error', text: 'Contraseña incorrecta' });
+    }
+  }
+});
+
+btnLogoutAdmin.addEventListener('click', () => {
+  isAdmin = false;
+  btnLoginAdmin.classList.remove('d-none');
+  btnLogoutAdmin.classList.add('d-none');
+  Swal.fire({ icon: 'info', text: 'Cerraste sesión admin' });
+  imprimirTurnos();
+});
+
+// CLICK en elegir servicio
+document.getElementById('carousel-inner').addEventListener('click', (e) => {
   const btn = e.target.closest('.btn-elegir');
   if (!btn) return;
   const id = Number(btn.dataset.id);
-  const servicio = servicios.find(s => s.id === id);
-  if (!servicio) return;
 
-  // prellenar servicio
+  const servicio = (typeof servicios !== 'undefined') ? servicios.find(s => s.id === id) : null;
+  if (!servicio) {
+    Swal.fire({ icon: 'error', text: 'Servicio no encontrado' });
+    return;
+  }
+
   modalServicioNombre.textContent = servicio.nombre;
-  modalFecha.value = ''; // limpia
+  modalFecha.value = '';
   modalHora.value = '';
   modalError.classList.add('d-none');
   bsModal.show();
 
-  // confirmar formulario
   modalConfirmarBtn.onclick = () => {
     if (!modalFecha.value || !modalHora.value) {
       modalError.classList.remove('d-none');
       return;
     }
-    // datos del formulario
+    if (modalFecha.value < hoyStr) {
+      modalError.textContent = 'No se permiten fechas anteriores a hoy.';
+      modalError.classList.remove('d-none');
+      return;
+    }
+    if (!horaValida(modalHora.value)) {
+      modalError.textContent = `Solo se permiten horas entre ${HORA_MIN} y ${HORA_MAX}.`;
+      modalError.classList.remove('d-none');
+      return;
+    }
+
     inputServicio.value = servicio.nombre;
     inputFecha.value = modalFecha.value;
     inputHora.value = modalHora.value;
@@ -94,11 +111,10 @@ carouselInner.addEventListener('click', (e) => {
   };
 });
 
-//mostrar turnos
+// imprimir turnos
 function imprimirTurnos() {
   contenedorTurnos.innerHTML = '';
 
-  // función de orden superior: forEach 
   turnos.forEach(turno => {
     const card = document.createElement('div');
     card.className = 'card mb-2';
@@ -109,60 +125,90 @@ function imprimirTurnos() {
           <div>${turno.nombre} ${turno.apellido}</div>
           <div class="text-muted small">${turno.servicio} • ${turno.fecha} ${turno.hora}</div>
         </div>
-        <button class="btn btn-success btn-sm btn-atender" data-num="${turno.numero}">Atender</button>
+        <div class="d-flex gap-2 align-items-center">
+          ${ isAdmin ? `<button class="btn btn-success btn-sm btn-atender" data-num="${turno.numero}">Atender</button>` : '' }
+        </div>
       </div>
     `;
     contenedorTurnos.appendChild(card);
   });
 
-  // asignar eventos a botones "Atender"
-  contenedorTurnos.querySelectorAll('.btn-atender').forEach(b => {
-    b.addEventListener('click', () => {
-      const num = Number(b.dataset.num);
-      atenderTurno(num);
+  // asignar eventos: admin
+  if (isAdmin) {
+    contenedorTurnos.querySelectorAll('.btn-atender').forEach(b => {
+      b.addEventListener('click', () => {
+        const num = Number(b.dataset.num);
+        atenderTurno(num);
+      });
     });
-  });
+  }
 }
 
-//Agregar turno
+// agregar turno (con try-catch-finally)
 function agregarTurno(nombre, apellido, servicio, fecha, hora) {
-  contador++;
-  const nuevo = { numero: contador, nombre, apellido, servicio, fecha, hora };
-  turnos.push(nuevo);
-  localStorage.setItem('turnos', JSON.stringify(turnos));
-  imprimirTurnos();
+  try {
+    contador++;
+    const nuevo = { numero: contador, nombre, apellido, servicio, fecha, hora };
+    turnos.push(nuevo);
+    localStorage.setItem('turnos', JSON.stringify(turnos));
+    Swal.fire({ icon: 'success', text: `Turno reservado. N° ${nuevo.numero}` });
+    imprimirTurnos();
+  } catch (error) {
+    Swal.fire({ icon: 'error', text: 'No se pudo guardar el turno' });
+  } finally {
+    
+  }
 }
 
-// eliminar turno
+// atender turno (solo admin)
 function atenderTurno(numero) {
   turnos = turnos.filter(t => t.numero !== numero);
   localStorage.setItem('turnos', JSON.stringify(turnos));
+  Swal.fire({ icon: 'success', text: `Turno N° ${numero} atendido` });
   imprimirTurnos();
 }
 
-//enviar al formulario
+// submit del formulario con validaciones
 form.addEventListener('submit', (e) => {
   e.preventDefault();
+
   const nombre = document.getElementById('nombreCliente').value.trim();
   const apellido = document.getElementById('apellidoCliente').value.trim();
   const servicio = inputServicio.value.trim();
   const fecha = inputFecha.value;
   const hora = inputHora.value;
- 
 
+  // validaciones
   if (!nombre || !apellido || !servicio || !fecha || !hora) {
-    
+    Swal.fire({ icon: 'warning', text: 'Completá todos los campos' });
+    return;
+  }
+  if (fecha < hoyStr) {
+    Swal.fire({ icon: 'warning', text: 'No podés elegir una fecha anterior a hoy' });
+    return;
+  }
+  if (!horaValida(hora)) {
+    Swal.fire({ icon: 'warning', text: `Horario inválido. Solo ${HORA_MIN} - ${HORA_MAX}` });
     return;
   }
 
-  
-
-  agregarTurno(nombre, apellido, servicio, fecha, hora);
-  form.reset();
-  inputServicio.value = '';
-  inputFecha.value = '';
-  inputHora.value = '';
+  // agregar turno con try-catch-finally
+  try {
+    agregarTurno(nombre, apellido, servicio, fecha, hora);
+    // reset del formulario
+    form.reset();
+    inputServicio.value = '';
+    inputFecha.value = '';
+    inputHora.value = '';
+  } catch (err) {
+    Swal.fire({ icon: 'error', text: 'Error al crear el turno' });
+  } finally {
+    
+    imprimirTurnos();
+  }
 });
 
-// iniciar la lista
-imprimirTurnos();
+// iniciar lista al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+  imprimirTurnos();
+});

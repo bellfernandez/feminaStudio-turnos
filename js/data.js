@@ -39,7 +39,7 @@ function renderizarCarousel(serviciosList) {
         <div class="card servicio-card h-100">
           <div class="card-body d-flex flex-column">
             <h6 class="card-title">${serv.nombre}</h6>
-            <p class="card-text text-muted small mb-3">${serv.duracion}</p>
+            <p class="card-text text-muted small mb-3">${serv.precio}</p>
             <button class="btn btn-primary btn-elegir mt-auto" data-id="${serv.id}">Elegir</button>
           </div>
         </div>

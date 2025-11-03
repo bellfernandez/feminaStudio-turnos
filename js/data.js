@@ -1,5 +1,6 @@
 let servicios = []; 
 
+// cargar servicios desde JSON
 async function cargarServicios() {
   try {
     const res = await fetch('./js/servicios.json');
@@ -12,38 +13,38 @@ async function cargarServicios() {
       title: 'Error',
       text: 'No se pudieron cargar los servicios. Intentá recargar la página.'
     });
-  } finally {
-    
   }
 }
 
-// render carousel //
+// renderizar carrusel con 3 cards por slide
 function renderizarCarousel(serviciosList) {
   const carouselInner = document.getElementById('carousel-inner');
   carouselInner.innerHTML = '';
 
-  const perSlide = 3;
+  const perSlide = 3; // cards por slide
   for (let i = 0; i < serviciosList.length; i += perSlide) {
     const slice = serviciosList.slice(i, i + perSlide);
+
     const item = document.createElement('div');
     item.className = 'carousel-item';
     if (i === 0) item.classList.add('active');
 
     const row = document.createElement('div');
-    row.className = 'd-flex justify-content-start gap-3 p-3';
+    row.className = 'row justify-content-center g-3 p-3';
 
     slice.forEach(serv => {
-      const card = document.createElement('div');
-      card.className = 'card servicio-card';
-      card.style.width = '12rem';
-      card.innerHTML = `
-        <div class="card-body d-flex flex-column">
-          <h6 class="card-title">${serv.nombre}</h6>
-          <p class="card-text text-muted small mb-3">${serv.duracion}</p>
-          <button class="btn btn-primary btn-elegir" data-id="${serv.id}">Elegir</button>
-         </div>
+      const col = document.createElement('div');
+      col.className = 'col-12 col-md-4'; // 1 por fila mobile, 3 en desktop
+      col.innerHTML = `
+        <div class="card servicio-card h-100">
+          <div class="card-body d-flex flex-column">
+            <h6 class="card-title">${serv.nombre}</h6>
+            <p class="card-text text-muted small mb-3">${serv.duracion}</p>
+            <button class="btn btn-primary btn-elegir mt-auto" data-id="${serv.id}">Elegir</button>
+          </div>
+        </div>
       `;
-      row.appendChild(card);
+      row.appendChild(col);
     });
 
     item.appendChild(row);
@@ -51,5 +52,7 @@ function renderizarCarousel(serviciosList) {
   }
 }
 
-// ejecuta la carga
-cargarServicios();
+// ejecutar carga al iniciar
+document.addEventListener('DOMContentLoaded', () => {
+  cargarServicios();
+});
